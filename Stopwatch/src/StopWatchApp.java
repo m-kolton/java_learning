@@ -62,11 +62,11 @@ public class StopWatchApp extends JFrame {
 		// pierwszy wiersz
 		c.gridx = 0;
 		c.gridy = 1;
-		//content.add(createDisplayPanel(), c);
+		content.add(createDisplayPanel(), c);
 		// drugi wiersz
 		c.gridx = 0;
 		c.gridy = 2;
-		//content.add(createButtonsPanel(), c);
+		content.add(createButtonsPanel(), c);
 	}
 	
 	private JPanel createDisplayPanel() {
@@ -110,7 +110,31 @@ public class StopWatchApp extends JFrame {
 		displayPanel.add(secondsField,c);
 		
 		return displayPanel;
-}
+	}
+	
+	private JPanel createButtonsPanel() {
+		JPanel buttonsPanel = new JPanel();
+		ButtonActions actionListener = new ButtonActions();
+		buttonsPanel.setLayout(new GridLayout(1, 3));
+		startButton = new JButton("Start");
+		startButton.setSize(10, 60);
+		startButton.setActionCommand("start");
+		startButton.addActionListener(actionListener);
+		stopButton = new JButton("Stop");
+		stopButton.setSize(10, 60);
+		stopButton.setActionCommand("stop");
+		stopButton.addActionListener(actionListener);
+		resetButton = new JButton("Reset");
+		resetButton.setSize(10, 60);
+		resetButton.setActionCommand("reset");
+		resetButton.addActionListener(actionListener);
+		buttonsPanel.add(startButton);
+		buttonsPanel.add(stopButton);
+		buttonsPanel.add(resetButton);
+		
+		return buttonsPanel;
+		
+	}
 	
 	class ConfirmOnClose extends WindowAdapter {
 		@Override 
@@ -123,6 +147,27 @@ public class StopWatchApp extends JFrame {
 				System.exit(0);
 			}
 		}
+	}
+	
+	// niedokoñczona klasa wewnêtrzna
+	class ButtonActions implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent ev) {
+			String actCommand = ev.getActionCommand();
+			
+			if(actCommand.equalsIgnoreCase("reset")) {
+				hours = 0;
+				minutes = 0;
+				seconds = 0;
+			} 
+			else if(actCommand.equalsIgnoreCase("start")) {
+				System.out.println("Klikniêto przycisk START");
+				
+			}
+			
+		}
+		
 	}
 	
 }
