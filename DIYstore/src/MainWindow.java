@@ -5,6 +5,8 @@ import java.awt.event.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
+
 import javax.swing.border.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
@@ -47,6 +49,7 @@ public class MainWindow extends JFrame {
 	}
 	
 	String imagePath = null;
+	int position;
 	
 	public Connection getConnection() {
 		Connection con = null;
@@ -106,6 +109,7 @@ public class MainWindow extends JFrame {
 		ArrayList<Product> list = getProducts();
 		DefaultTableModel model = (DefaultTableModel) table.getModel();
 		
+		model.setRowCount(0);
 		Object[] row = new Object[4];
 		for(int i = 0; i < list.size(); i++) {
 			row[0] = list.get(i).getId();
@@ -133,6 +137,22 @@ public class MainWindow extends JFrame {
 		}
 	}
 	
+	// show item
+	public void showItem(int index) {
+		txtId.setText(Integer.toString(getProducts().get(index).getId()));
+		txtName.setText(getProducts().get(index).getName());
+		txtPrice.setText(Float.toString(getProducts().get(index).getPrice()));
+		
+		try {
+			Date addDate = null;
+			addDate = new SimpleDateFormat("yyyy-MM-dd").parse((String)getProducts().get(index).getAddDate());
+			txtAddDate.setDate(addDate);
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		lblImageWindow.setIcon(resizeImage(null, getProducts().get(index).getImage()));
+	}
 	// gui
 	public void initComponents() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -240,6 +260,7 @@ public class MainWindow extends JFrame {
 							preparedStatement.setString(3,  addDate);
 							preparedStatement.setInt(4, Integer.parseInt(txtId.getText()));
 							preparedStatement.executeUpdate();
+							showProducts();
 							
 							JOptionPane.showMessageDialog(null, "Data updated!");
 						} catch(SQLException e) {
@@ -260,9 +281,9 @@ public class MainWindow extends JFrame {
 							preparedStatement.setBlob(4,  img);
 							preparedStatement.setInt(5, Integer.parseInt(txtId.getText()));
 							preparedStatement.executeUpdate();
+							showProducts();
 							
 							JOptionPane.showMessageDialog(null, "Data updated!");
-							
 						} catch(Exception e) {
 							e.printStackTrace();
 						}
@@ -285,6 +306,8 @@ public class MainWindow extends JFrame {
 						int id = Integer.parseInt(txtId.getText());
 						preparedStatement.setInt(1, id);
 						preparedStatement.executeUpdate();
+						showProducts();
+						
 						JOptionPane.showMessageDialog(null, "Data deleted!");
 					} catch(SQLException e) {
 						e.printStackTrace();
@@ -304,6 +327,13 @@ public class MainWindow extends JFrame {
 		contentPane.add(scrollPane);
 		
 		table = new JTable();
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int index = table.getSelectedRow();
+				showItem(index);
+			}
+		});
 		table.setModel(new DefaultTableModel(
 			new Object[][] {
 			},
@@ -314,20 +344,56 @@ public class MainWindow extends JFrame {
 		scrollPane.setViewportView(table);
 		
 		JButton btnFirst = new JButton("First");
+		btnFirst.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ev) {
+				position = 0;
+				showItem(position);
+			}
+		});
+		
 		btnFirst.setBounds(320, 335, 75, 30);
 		contentPane.add(btnFirst);
 		
 		JButton btnLast = new JButton("Last");
+		btnLast.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				position = getProducts().size() - 1;
+				showItem(position);
+			}
+		});
+		
 		btnLast.setBounds(586, 335, 75, 30);
 		contentPane.add(btnLast);
 		
-		JButton btnNext = new JButton("Next");
-		btnNext.setBounds(405, 335, 75, 30);
-		contentPane.add(btnNext);
-		
 		JButton btnPrevious = new JButton("Previous");
-		btnPrevious.setBounds(501, 335, 75, 30);
+		btnPrevious.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				position --;
+				
+				if(position < 0) {
+					position = 0;
+				}
+				showItem(position);
+			}
+		});
+		
+		btnPrevious.setBounds(405, 335, 85, 30);
 		contentPane.add(btnPrevious);
+		
+		JButton btnNext = new JButton("Next");
+		btnNext.addActionListener(new ActionListener() {	
+			public void actionPerformed(ActionEvent e) {
+				position ++;
+				
+				if(position >= getProducts().size()) {
+					position = getProducts().size() - 1;
+				}
+				showItem(position);
+			}
+		});
+		
+		btnNext.setBounds(491, 335, 85, 30);
+		contentPane.add(btnNext);
 		
 		JButton btnChooseImage = new JButton("Choose Image");
 		btnChooseImage.addActionListener(new ActionListener() {
