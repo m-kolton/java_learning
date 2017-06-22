@@ -51,7 +51,7 @@ public class MainWindow extends JFrame {
 	public Connection getConnection() {
 		Connection con = null;
 		try {
-			con = DriverManager.getConnection("jdbc:mysql://localhost/products_db", "root","shippuudena");
+			con = DriverManager.getConnection("jdbc:mysql://localhost/products_db", "root","root");
 			//JOptionPane.showMessageDialog(null, "Connected");
 			return con;
 		} catch (SQLException e) {
